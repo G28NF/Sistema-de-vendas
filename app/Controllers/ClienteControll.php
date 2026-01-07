@@ -143,7 +143,7 @@ class ClienteControll extends BaseController{
 
     public function listar()
     {
-        $this->ClienteModel->select('id', 'nome', 'email', 'telefone', 'telefone2')->FindALL();
+        $this->ClienteModel->select('id', 'nome', 'email', 'telefone', 'endereco')->FindALL();
         return view('cliente/listar', ['clientes' => $clientes]);
     }
 }
