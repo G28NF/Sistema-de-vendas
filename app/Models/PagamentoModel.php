@@ -7,12 +7,11 @@ class PagamentoModel extends Model
 {
     protected $table         = 'Pagamento';
     protected $primaryKey    = 'id';
-    protected $allowedFields = ['valor', 'data_compra', 'forma_pagamento'];
+    protected $allowedFields = ['valor', 'forma_pagamento'];
     
     protected $validationRules = 
     [
         'valor' => 'required|numeric',
-        'data_compra' => 'required|valid_date[Y-d-m]',
         'forma_pagamento' => 'required|in_list[pix,boleto,credito,debito,dinheiro]'
     ];
 }

@@ -15,30 +15,30 @@ class ClienteControll extends BaseController{
 
     public function criar()
     {
-        $create = $this->request->getPost(
+        $create = $this->request->getPost([
         'nome', 
-        'nascimento', 
-        'cpf',
-        'rg',
+        'nascimento',
         'endereco',
         'email',
         'telefone',
-        'telefone2'
-        );
+        ]);
 
         $create['senha'] = password_hash($this->request->getPost('senha'),PASSWORD_DEFAULT);
+        $create['cpf'] = password_hash($this->request->getPost('cpf'),PASSWORD_DEFAULT);
+        $create['rg'] = password_hash($this->request->getPost('rg'),PASSWORD_DEFAULT);
 
-        if($this->ModelCliente->insert($create) === false)
+        if ($this->ModelCliente->insert($create) === false) 
         {
             return redirect()->back()->with('erro', 'Faltou campo a ser preenchido')->withInput();
         }
 
         session()->set([
-        'id'    => $usuario['id'],
-        'email' => $usuario['email'],
-        'nome'  => $usuario['nome'],
-        'cpf'   => $usuario['cpf'],
-        'login' => true
+            'id'    => $usuario['id'],
+            'email' => $usuario['email'],
+            'nome'  => $usuario['nome'],
+            'cpf'   => $usuario['cpf'],
+            'rg'    => $usuario['rg'],
+            'login' => true
         ]);
 
         return redirect()->back();
@@ -62,11 +62,11 @@ class ClienteControll extends BaseController{
         }
 
         session()->set([
-            'id' => $usuario['id'],
+            'id'    => $usuario['id'],
             'email' => $usuario['email'],
             'nome'  => $usuario['nome'],
             'cpf'   => $usuario['cpf'],
-            'rg'   => $usuario['rg'],
+            'rg'    => $usuario['rg'],
             'login' => true
         ]);
 
@@ -81,18 +81,18 @@ class ClienteControll extends BaseController{
             ->where('email', $email) 
             ->first();
 
-        if(!$usuario){
-            return redirect()->back()->with('erro', 'Usuário não encontrado.')->withInput();
-        } else if(!$usuario === null) {
-            return redirect()->back()->with('erro', 'Digite o email do usuario.')->withInput();
+        if (!$usuario || !password_verify($senhaAtual, $usuario['senha']))
+        {
+            return redirect()->back()->with('erro', 'Os dados não correspondem.')->withInput();
         }
 
         $senhaNova = $this->request->getPost('senhaNova');
-        $senhaNova = password_hash($senhaNova, PASSWORD_DEFAULT);
 
         if(empty($senhaNova)) {
             return redirect()->back()->with('erro', 'Digite a nova senha.')->withInput();
         }
+
+        $senhaNova = password_hash($senhaNova, PASSWORD_DEFAULT);
 
         $this->ModelCliente->update($usuario['id'], ['senha' => $senhaNova]);
 
@@ -115,7 +115,6 @@ class ClienteControll extends BaseController{
         
         $cliente = $this->ModelCliente
             ->where('email', $email)
-            ->where('senha', $senha)
             ->first();
 
         if (!$cliente)
@@ -123,7 +122,12 @@ class ClienteControll extends BaseController{
             return redirect()->back()->with('erro', 'Os dados não correspondem.')->withInput();
         }
 
-        $this->ModelCliente->where('email', $cliente)->delete();
+        if (!password_verify($senha, $cliente['senha']))
+        {
+            return redirect()->back()->with('erro', 'Os dados não correspondem.')->withInput();
+        }
+
+        $this->ModelCliente->delete($cliente['id']);
 
         return redirect()->back();
     }
