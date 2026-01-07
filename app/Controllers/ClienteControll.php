@@ -23,6 +23,15 @@ class ClienteControll extends BaseController{
         'telefone',
         ]);
 
+        $nascimentoUsuario = new DateTime($create['nascimento']);
+        $dataHoje = new DateTime();
+        $idade = $dataHoje->diff($nascimentoUsuario)->y;
+
+        if($idade < 18)
+        {
+            return redirect()->back()->with('erro', 'Menor de idade não é permitido realizar compras onlines.');
+        }
+
         $create['senha'] = password_hash($this->request->getPost('senha'),PASSWORD_DEFAULT);
         $create['cpf'] = password_hash($this->request->getPost('cpf'),PASSWORD_DEFAULT);
         $create['rg'] = password_hash($this->request->getPost('rg'),PASSWORD_DEFAULT);
