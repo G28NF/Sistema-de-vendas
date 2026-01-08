@@ -5,17 +5,24 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-$routes->get('/', 'Home::index');
 
-$routes->get('usuarios', 'UsuarioController::index');
+    //==============================================================
+    // Rotas de Clientes - Acesso para 'user' E/OU 'admin'
+    //==============================================================
 
-$routes->get('health/db', function () {
-    try {
-        $db = \Config\Database::connect();
-        $db->query('SELECT 1');
-        return 'DB OK';
-    } catch (\Throwable $e) {
-        return $e->getMessage();
-    }
-});
+    $routes->group('clientes', ['filter' => 'app_group:admin,user'], static function ($routes) {
+        $routes->get('', 'ClienteController::index');
+        $routes->post('criar', 'ClienteController::criar');
+        $routes->post('login', 'ClienteController::login');
+        $routes->post('editar', 'ClienteController::editar');
+        $routes->get('delete', 'ClienteController::delete');
+        $routes->post('listar', 'ClienteController::listar');
+    });
 
+    //==============================================================
+    // Rotas de Clientes - Acesso para E 'admin'
+    //==============================================================
+
+    $routes->group('clientes', ['filter' => 'app_group:admin'], static function ($routes) {
+        $routes->post('adminDelete', 'ClienteController::adminDelete');
+    });

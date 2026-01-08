@@ -18,6 +18,6 @@ class ClienteModel extends Model
         'endereco' => 'required|min_length[20]|max_length[200]',
         'email' => 'required|min_length[10]|max_length[150]|is_unique[Cliente.email,id,{id}]',
         'senha' => 'required|min_length[8]|max_length[255]',
-        'telefone' => 'required|exact_length[13]|is_unique[Cliente.telefone,id,{id}]',
+        'telefone' => 'required|exact_length[13]|is_unique[Cliente.telefone,id,{id}]'
     ];
 } 

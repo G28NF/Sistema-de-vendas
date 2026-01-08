@@ -141,6 +141,41 @@ class ClienteControll extends BaseController{
         return redirect()->back();
     }
 
+    public function adminDelete()
+    {
+        $email = session()->get('email');
+        $senha = $this->request->getPost('senha');
+
+        $usuario = $this->ModelCliente
+            ->where('email', $email)
+            ->first();
+
+        if (!$email || $usuario['status'] !== 'admin')
+        {
+            return redirect()->back()->with('erro', 'Você não é um admin.');
+        }
+
+        if (!password_verify($senha, $usuario['senha']))
+        {
+            return redirect()->back()->with('erro', 'Os dados não correspondem.')->withInput();
+        }
+
+        $deletarCliente = $this->request->getPost('id');
+
+        $cliente = $this->ModelCliente
+            ->where('id', $deletarCliente)
+            ->first();
+
+        if (!$cliente) 
+        {
+            return redirect()->back()->with('erro', 'Cliente não encontrado.');
+        }
+
+        $this->ModelCliente->delete($cliente['id']);
+
+        return redirect()->back()->with('sucesso', 'Cliente deletado com sucesso.');
+    }
+
     public function listar()
     {
         $this->ClienteModel->select('id', 'nome', 'email', 'telefone', 'endereco')->FindALL();
